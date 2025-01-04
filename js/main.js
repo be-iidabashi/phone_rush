@@ -108,7 +108,20 @@ const textureloader = new TextureLoader();
 const glbloader = new GLTFLoader();
 
 // プレイヤーの描画
-// ここに記述
+glbloader.load(
+  glbUrls[0],
+  function (gltf) {
+    player = gltf.scene;
+    player.scale.set(3, 2, 3);
+    player.rotation.set(0, Math.PI, 0);
+    player.position.set(0, 0, 0);
+    scene.add(player);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
 
 // 建物の描画
 glbloader.load(
@@ -130,8 +143,24 @@ glbloader.load(
 );
 
 // スマホの描画
-// ここに記述
-
+glbloader.load(
+  glbUrls[2],
+  function (gltf) {
+    for (let g = 1; g < 10; g++) {
+      model = gltf.scene.clone();
+      model.scale.set(15, 15, 15);
+      model.rotation.set(0, Math.PI / 4, Math.PI / 4);
+      const randomIndex = Math.floor(Math.random() * 3); // 0 、1 、2 のランダム
+      model.position.set(course[randomIndex], 2, -10 * g);
+      phone_list.push(model); // オブジェクトのバウンディングボックスを計算
+      scene.add(model);
+    }
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
 // 障害物の描画
 for (let g = 1; g < 12; g++) {
   geometry = new ConeGeometry(1, 4, 32);
@@ -162,7 +191,23 @@ textureloader.load(
 );
 
 // ゴールの描画
-// ここに記述
+textureloader.load(
+  textureUrls[1],
+  function (texture) {
+    geometry = new BoxGeometry(24, 10, 0.5); // 地面のジオメトリを作成 (BoxGeometry)
+    sphereMaterial = new MeshPhongMaterial();
+    sphereMaterial.map = texture;
+    goal = new Mesh(geometry, sphereMaterial); // メッシュを作成 (ジオメトリ + マテリアル)
+    goal.position.set(0, 5, -200);
+    goalBoundingBox = new Box3().setFromObject(goal);
+    // ground.receiveShadow = true; // 影を受け取る設定
+    scene.add(goal);
+  },
+  undefined,
+  function (error) {
+    console.error(error);
+  }
+);
 
 // センサの値の読み取り
 document.addEventListener("DOMContentLoaded", function () {
